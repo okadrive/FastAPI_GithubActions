@@ -1,18 +1,21 @@
 import pytest
 import requests
 
-# テスト対象のAPI Gatewayエンドポイント
-endpoint = "http://0.0.0.0:8000"
+# API Gateway endpoint
+endpoint = "http://0.0.0.0:8080"
 
-# HTTPリクエストヘッダー
 headers = {
     "Content-Type": "application/json",
     "Accept": "application/json"
 }
 
 def test_main():
-    # API GatewayエンドポイントにPOSTリクエストを送信
-    response = requests.get(endpoint, headers=headers)
+    # get request
+    try:
+        response = requests.get(endpoint, headers=headers, timeout=10)
 
-    # ステータスコードの検証
+    except requests.exceptions.ConnectionError:
+        pytest.fail("API Gateway is not running")
+
+    # verify response
     assert response.status_code == 200

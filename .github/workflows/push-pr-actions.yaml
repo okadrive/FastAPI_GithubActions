@@ -16,7 +16,7 @@ jobs:
         run: docker build . --file Dockerfile --tag my-docker-image:${{ github.sha }}
 
   run:
-    name: Run & Test the Docker image
+    name: Run the Docker image
     runs-on: ubuntu-22.04
     steps:
       - uses: actions/checkout@v4
@@ -27,7 +27,7 @@ jobs:
         run: docker run -dit --name my_docker_container -p 8000:8000 my-docker-image:${{ github.sha }}
 
   test:
-    requires: run
+    needs: run
     name: Test the WebAPI on Docker image
     runs-on: ubuntu-22.04
     steps:
@@ -36,7 +36,7 @@ jobs:
         run: docker build . --file Dockerfile --tag my-docker-image:${{ github.sha }}
 
       - name: Run the Docker image
-        run: docker run -dit --name my_docker_container -p 8000:8000 my-docker-image:${{ github.sha }}
+        run: docker run -dit --name my_docker_container -p 8080:8080 my-docker-image:${{ github.sha }}
 
       - name: HTTP Request to the FastAPI server
-        run: pytest tests/test_main.py::test_main
+        run: docker exec my_docker_container pytest tests/test_main.py
