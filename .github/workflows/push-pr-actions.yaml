@@ -26,11 +26,17 @@ jobs:
       - name: Run the Docker image
         run: docker run -dit --name my_docker_container -p 8000:8000 my-docker-image:${{ github.sha }}
 
-      - name: Wait for the Docker image to start
-        run: sleep 5
+  test:
+    requires: run
+    name: Test the WebAPI on Docker image
+    runs-on: ubuntu-22.04
+    steps:
+      - uses: actions/checkout@v4
+      - name: Build the Docker image
+        run: docker build . --file Dockerfile --tag my-docker-image:${{ github.sha }}
 
-      - name: Check the Docker image is running
-        run: docker ps | grep my_docker_container
+      - name: Run the Docker image
+        run: docker run -dit --name my_docker_container -p 8000:8000 my-docker-image:${{ github.sha }}
 
       - name: HTTP Request to the FastAPI server
-        run: curl -s http://localhost:8000/
+        run: pytest tests/test_main.py::test_main
