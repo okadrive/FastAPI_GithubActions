@@ -8,7 +8,7 @@ on:
 
 jobs:
   build:
-    name: Build the Docker image
+    name: Build Container Image
     runs-on: ubuntu-22.04
     steps:
       - uses: actions/checkout@v4
@@ -16,7 +16,7 @@ jobs:
         run: docker build . --file Dockerfile --tag my-docker-image:${{ github.sha }}
 
   run:
-    name: Run the Docker image
+    name: Run Container
     runs-on: ubuntu-22.04
     steps:
       - uses: actions/checkout@v4
@@ -26,9 +26,17 @@ jobs:
       - name: Run the Docker image
         run: docker run -dit --name my_docker_container -p 8000:8000 my-docker-image:${{ github.sha }}
 
+      - name: Wait for server to be ready
+        run: |
+          while ! curl -s http://0.0.0.0:8000 > /dev/null; do
+            echo "Waiting for server..."
+            sleep 5
+          done
+        shell: bash
+
   test:
     needs: run
-    name: Test the WebAPI on Docker image
+    name: Test the WebAPI with Container
     runs-on: ubuntu-22.04
     steps:
       - uses: actions/checkout@v4
