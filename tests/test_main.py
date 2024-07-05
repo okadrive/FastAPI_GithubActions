@@ -2,12 +2,10 @@ import pytest
 import requests
 
 # API Gateway endpoint
-endpoint = "http://0.0.0.0:8080"
+endpoint = "http://0.0.0.0:8000"
 
-headers = {
-    "Content-Type": "application/json",
-    "Accept": "application/json"
-}
+headers = {"Content-Type": "application/json", "Accept": "application/json"}
+
 
 def test_main():
     # get request

@@ -36,7 +36,7 @@ jobs:
         run: docker build . --file Dockerfile --tag my-docker-image:${{ github.sha }}
 
       - name: Run the Docker image
-        run: docker run -dit --name my_docker_container -p 8080:8080 my-docker-image:${{ github.sha }}
+        run: docker run -dit --name my_docker_container -p 8000:8000 my-docker-image:${{ github.sha }}
 
       - name: HTTP Request to the FastAPI server
         run: docker exec my_docker_container pytest tests/test_main.py
