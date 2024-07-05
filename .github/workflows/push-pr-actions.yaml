@@ -38,5 +38,13 @@ jobs:
       - name: Run the Docker image
         run: docker run -dit --name my_docker_container -p 8000:8000 my-docker-image:${{ github.sha }}
 
+      - name: Wait for server to be ready
+        run: |
+        while ! curl -s http://0.0.0.0:8000 > /dev/null; do
+          echo "Waiting for server..."
+          sleep 5
+        done
+      shell: bash
+
       - name: HTTP Request to the FastAPI server
         run: docker exec my_docker_container pytest tests/test_main.py
