@@ -57,8 +57,3 @@ jobs:
       - name: HTTP Request to the FastAPI server
         run: docker exec my_docker_container pytest tests/test_main.py
 
-      - name: Upload test results
-        uses: actions/upload-artifact@v2
-        with:
-          name: test-report
-          path: tests/reports/
