@@ -1,2 +1,2 @@
 "Status","Start Time","Stop Time","Duration in ms","Parent Suite","Suite","Sub Suite","Test Class","Test Method","Name","Description"
-"passed","Wed Aug 14 10:03:03 UTC 2024","Wed Aug 14 10:03:03 UTC 2024","5","tests","test_main","","","","test_main",""
+"passed","Wed Aug 14 10:21:01 UTC 2024","Wed Aug 14 10:21:01 UTC 2024","7","tests","test_main","","","","test_main",""
