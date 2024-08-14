@@ -1,0 +1,68 @@
+name: Generate Test Report
+
+on:
+  workflow_run:
+    workflows: ["Docker Image CI"]
+    types:
+      - completed
+
+jobs:
+  test:
+    name: Generate Test Report
+    runs-on: ubuntu-22.04
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install system dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y libyaml-dev
+
+      - name: Install allure commandline
+        run: |
+          sudo apt-get install -y default-jre
+          wget https://github.com/allure-framework/allure2/releases/download/2.29.0/allure_2.29.0-1_all.deb
+          sudo dpkg -i allure_2.29.0-1_all.deb
+
+      - name: Install Python dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+
+      - name: Run the FastAPI server
+        run: |
+          uvicorn app.main:app --host 0.0.0.0 --port 8000 &
+
+      - name: Run tests with pytest
+        run: |
+          pytest --alluredir=allure-results tests/test_main.py
+
+      - name: Generate Allure report
+        run: |
+          mkdir allure-reports
+          allure generate allure-results --clean -o allure-reports/
+
+      - name: Deploy Allure report to Github Pages
+        if: success()
+        uses: peaceiris/actions-gh-pages@v4
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./allure-reports
+
+      - name: Upload Allure report as artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: allure-reports
+          path: allure-reports/
+
+      - name: Cleanup
+        run: |
+          kill $(lsof -t -i:8000)
+          rm -rf allure-results allure-reports

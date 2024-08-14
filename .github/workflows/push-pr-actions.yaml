@@ -56,4 +56,3 @@ jobs:
 
       - name: HTTP Request to the FastAPI server
         run: docker exec my_docker_container pytest tests/test_main.py
-
