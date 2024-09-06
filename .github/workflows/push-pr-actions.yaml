@@ -12,7 +12,7 @@ jobs:
     runs-on: ubuntu-22.04
     steps:
       - uses: actions/checkout@v4
-      - name: Build the Docker image
+      - name: Build docker image
         run: docker build . --file Dockerfile --tag my-docker-image:${{ github.sha }}
 
   run:
@@ -20,10 +20,10 @@ jobs:
     runs-on: ubuntu-22.04
     steps:
       - uses: actions/checkout@v4
-      - name: Build the Docker image
+      - name: Build docker image
         run: docker build . --file Dockerfile --tag my-docker-image:${{ github.sha }}
 
-      - name: Run the Docker image
+      - name: Run docker image
         run: docker run -dit --name my_docker_container -p 8000:8000 my-docker-image:${{ github.sha }}
 
       - name: Wait for server to be ready
@@ -36,14 +36,14 @@ jobs:
 
   test:
     needs: run
-    name: Test the WebAPI with Container
+    name: Test Container Image with Pytest
     runs-on: ubuntu-22.04
     steps:
       - uses: actions/checkout@v4
-      - name: Build the Docker image
+      - name: Build docker image
         run: docker build . --file Dockerfile --tag my-docker-image:${{ github.sha }}
 
-      - name: Run the Docker image
+      - name: Run docker image
         run: docker run -dit --name my_docker_container -p 8000:8000 my-docker-image:${{ github.sha }}
 
       - name: Wait for server to be ready
@@ -54,5 +54,5 @@ jobs:
           done
         shell: bash
 
-      - name: HTTP Request to the FastAPI server
+      - name: HTTP request to server
         run: docker exec my_docker_container pytest tests/test_main.py

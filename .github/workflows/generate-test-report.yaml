@@ -15,7 +15,7 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Setup Python
+      - name: Setup python
         uses: actions/setup-python@v5
         with:
           python-version: "3.12"
@@ -36,30 +36,32 @@ jobs:
           python -m pip install --upgrade pip
           pip install -r requirements.txt
 
-      - name: Run the FastAPI server
+      - name: Run FastAPI server
         run: |
           uvicorn app.main:app --host 0.0.0.0 --port 8000 &
 
-      - name: Run tests and generate Allure report
+      - name: Run tests and generate Allure results
         run: |
-          mkdir allure-reports
-          pytest --alluredir=allure-results tests/test_main.py
-          allure generate allure-results --clean -o allure-reports/
+          pytest --alluredir=./allure-results tests/test_main.py
+
+      - name: Generate Allure report
+        run: |
+          allure generate ./allure-results --clean -o ./allure-report
 
       - name: Deploy Allure report to Github Pages
         if: success()
         uses: peaceiris/actions-gh-pages@v4
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
-          publish_dir: ./allure-reports
+          publish_dir: ./allure-report
 
       - name: Upload Allure report as artifact
         uses: actions/upload-artifact@v4
         with:
-          name: allure-reports
-          path: allure-reports/
+          name: allure-report
+          path: ./allure-report
 
       - name: Cleanup
         run: |
           kill $(lsof -t -i:8000)
-          rm -rf allure-results allure-reports
+          rm -rf allure-results allure-report
