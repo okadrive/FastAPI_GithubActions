@@ -1,2 +1,2 @@
 "Status","Start Time","Stop Time","Duration in ms","Parent Suite","Suite","Sub Suite","Test Class","Test Method","Name","Description"
-"passed","Fri Sep 06 17:59:26 UTC 2024","Fri Sep 06 17:59:26 UTC 2024","3","tests","test_main","","","","Test API Gateway","This test case verifies the API Gateway is up and running"
+"passed","Fri Sep 06 18:10:37 UTC 2024","Fri Sep 06 18:10:37 UTC 2024","4","tests","test_main","","","","Test API Gateway","This test case verifies the API Gateway is up and running"
