@@ -1,12 +1,13 @@
 import pytest
 import requests
+import allure
 
 # API Gateway endpoint
 endpoint = "http://0.0.0.0:8000"
 
 headers = {"Content-Type": "application/json", "Accept": "application/json"}
 
-
+@allure.step("Test API Gateway")
 def test_main():
     # get request
     try:
