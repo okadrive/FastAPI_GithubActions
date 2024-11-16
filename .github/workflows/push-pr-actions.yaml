@@ -50,8 +50,12 @@ jobs:
     runs-on: ubuntu-22.04
     steps:
       - uses: actions/checkout@v4
-      - name: Build docker image
-        run: docker build . --file Dockerfile --tag my-docker-image:${{ github.sha }}
+      - name: Download docker image artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: my-docker-image
+      - name: Load docker image
+        run: docker load -i my-docker-image.tar
 
       - name: Run docker image
         run: docker run -dit --name my_docker_container -p 8000:8000 my-docker-image:${{ github.sha }}
