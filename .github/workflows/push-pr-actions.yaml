@@ -6,6 +6,10 @@ on:
   pull_request:
     branches: ["main"]
 
+env:
+  DOCKER_IMAGE_NAME: my-docker-image
+  DOCKER_CONTAINER_NAME: my-docker-container
+
 jobs:
   build:
     name: Build Container Image
@@ -13,14 +17,14 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - name: Build docker image
-        run: docker build . --file Dockerfile --tag my-docker-image:${{ github.sha }}
+        run: docker build . --file Dockerfile --tag ${{ env.DOCKER_IMAGE_NAME }}:${{ github.sha }}
       - name: Save docker image
-        run: docker save my-docker-image:${{ github.sha }} -o my-docker-image.tar
+        run: docker save ${{ env.DOCKER_IMAGE_NAME }}:${{ github.sha }} -o ${{ env.DOCKER_IMAGE_NAME }}.tar
       - name: Upload docker image artifact
         uses: actions/upload-artifact@v4
         with:
-          name: my-docker-image
-          path: my-docker-image.tar
+          name: ${{ env.DOCKER_IMAGE_NAME }}
+          path: ${{ env.DOCKER_IMAGE_NAME }}.tar
 
   run:
     name: Run Container
@@ -31,11 +35,11 @@ jobs:
       - name: Download docker image artifact
         uses: actions/download-artifact@v4
         with:
-          name: my-docker-image
+          name: ${{ env.DOCKER_IMAGE_NAME }}
       - name: Load docker image
-        run: docker load -i my-docker-image.tar
+        run: docker load -i ${{ env.DOCKER_IMAGE_NAME }}.tar
       - name: Run docker image
-        run: docker run -dit --name my_docker_container -p 8000:8000 my-docker-image:${{ github.sha }}
+        run: docker run -dit --name ${{ env.DOCKER_CONTAINER_NAME }} -p 8000:8000 ${{ env.DOCKER_IMAGE_NAME }}:${{ github.sha }}
       - name: Wait for server to be ready
         run: |
           while ! curl -s http://0.0.0.0:8000 > /dev/null; do
@@ -53,13 +57,11 @@ jobs:
       - name: Download docker image artifact
         uses: actions/download-artifact@v4
         with:
-          name: my-docker-image
+          name: ${{ env.DOCKER_IMAGE_NAME }}
       - name: Load docker image
-        run: docker load -i my-docker-image.tar
-
+        run: docker load -i ${{ env.DOCKER_IMAGE_NAME }}.tar
       - name: Run docker image
-        run: docker run -dit --name my_docker_container -p 8000:8000 my-docker-image:${{ github.sha }}
-
+        run: docker run -dit --name ${{ env.DOCKER_CONTAINER_NAME }} -p 8000:8000 ${{ env.DOCKER_IMAGE_NAME }}:${{ github.sha }}
       - name: Wait for server to be ready
         run: |
           while ! curl -s http://0.0.0.0:8000 > /dev/null; do
@@ -67,6 +69,5 @@ jobs:
             sleep 5
           done
         shell: bash
-
       - name: HTTP request to server
-        run: docker exec my_docker_container pytest tests/test_main.py
+        run: docker exec ${{ env.DOCKER_CONTAINER_NAME }} pytest tests/test_main.py
