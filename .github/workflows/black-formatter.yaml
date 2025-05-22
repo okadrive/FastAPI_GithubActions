@@ -1,0 +1,25 @@
+name: Format Python code with Black
+
+on:
+  pull_request:
+    paths:
+      - '**/*.py'
+  push:
+    branches:
+      - main
+    paths:
+      - '**/*.py'
+
+jobs:
+  black-format:
+    runs-on: ubuntu-22.04
+    steps:
+      - uses: actions/checkout@v4
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install Black
+        run: pip install black
+      - name: Run Black
+        run: black --check .
