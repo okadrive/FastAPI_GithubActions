@@ -1,23 +1,27 @@
-# Description: Dockerfile for FastAPI
-FROM python:3.12-slim
+FROM python:3.12-slim AS builder
 
 WORKDIR /code
-
 COPY ./requirements.txt /code/requirements.txt
 
 RUN apt-get update \
     && apt-get install -y --no-install-recommends build-essential curl \
     && curl https://sh.rustup.rs -sSf | sh -s -- -y \
+    && export PATH="/root/.cargo/bin:$PATH" \
+    && pip install --upgrade pip \
+    && pip install --upgrade --no-cache-dir -r requirements.txt \
+    && apt-get remove -y build-essential curl \
+    && apt-get autoremove -y \
+    && rm -rf /root/.cargo \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/*
 
-ENV PATH="/root/.cargo/bin:${PATH}"
+FROM python:3.12-slim
 
-SHELL ["/bin/bash", "-c"]
-RUN source $HOME/.cargo/env \
-    && pip install --no-cache-dir --upgrade pip \
-    && pip install --no-cache-dir --upgrade -r requirements.txt
-
+WORKDIR /code
+COPY --from=builder /code /code
+COPY --from=builder /usr/local/lib/python3.12/site-packages /usr/local/lib/python3.12/site-packages
+COPY --from=builder /usr/local/bin/uvicorn /usr/local/bin/uvicorn
+COPY --from=builder /usr/local/bin/pytest /usr/local/bin/pytest
 COPY ./app /code/app
 COPY ./tests /code/tests
 
